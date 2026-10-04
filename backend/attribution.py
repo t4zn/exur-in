@@ -4,8 +4,8 @@ Inverse Ray-Tracing Atmospheric Source Attribution Engine
 
 import math
 from typing import TypedDict, Optional
-from python_backend.air_data import CORRIDOR_STATIONS
-from python_backend.industrial_registry import INDUSTRIAL_CLUSTERS
+from backend.air_data import CORRIDOR_STATIONS
+from backend.industrial_registry import INDUSTRIAL_CLUSTERS
 
 class ParticlePoint(TypedDict):
     lat: float

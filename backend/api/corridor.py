@@ -4,7 +4,7 @@ import httpx
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Response
 from typing import Optional
-from python_backend.corridor_types import (
+from backend.corridor_types import (
     CorridorStation,
     CorridorApiResponse,
     deg_to_cardinal,

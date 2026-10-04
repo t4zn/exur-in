@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 from typing import Optional, Literal
 
-from python_backend.advisor_engine import generate_atmospheric_advice
+from backend.advisor_engine import generate_atmospheric_advice
 
 router = APIRouter()
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from python_backend.earth_engine import (
+from backend.earth_engine import (
     get_gee_harmonization_data,
     get_gee_orbital_anchor_for_coordinate,
 )

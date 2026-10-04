@@ -11,10 +11,10 @@ Exur has been migrated to a unified **Python FastAPI Web Service** architecture:
 - **Backend (Python 3.12 / FastAPI):**
   - High-performance asynchronous API layer with full support for SSE streaming chat, NASA FIRMS processing, Open-Meteo & OpenWeather aggregation, and ISRO MOSDAC satellite telemetry.
   - Complete atmospheric physics & dispersion modeling in Python:
-    - `python_backend/advisor_engine.py`: Grounded citizen respiratory advisor.
-    - `python_backend/attribution.py`: Lagrangian backward kinematic ray-tracing.
-    - `python_backend/earth_engine.py`: Multi-sensor GEE atmospheric harmonization.
-    - `python_backend/aod_to_aqi.py`: Columnar AOD to ground-level PM2.5 converter.
+    - `backend/advisor_engine.py`: Grounded citizen respiratory advisor.
+    - `backend/attribution.py`: Lagrangian backward kinematic ray-tracing.
+    - `backend/earth_engine.py`: Multi-sensor GEE atmospheric harmonization.
+    - `backend/aod_to_aqi.py`: Columnar AOD to ground-level PM2.5 converter.
 - **Frontend (Apple Design System):**
   - Pre-compiled static React export (`out/`) served directly by FastAPI with zero UI modifications, providing fast loading, interactive Leaflet corridor maps, and smartphone radiometry.
 

@@ -33,7 +33,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY --from=builder /app/out ./out
 
 # Copy python backend code
-COPY python_backend/ ./python_backend/
+COPY backend/ ./backend/
 COPY main.py .
 
 # Copy environment template if exists

@@ -36,14 +36,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 
 # Import API Routers
-from python_backend.api.chat import router as chat_router
-from python_backend.api.corridor import router as corridor_router
-from python_backend.api.firms import router as firms_router
-from python_backend.api.gee import router as gee_router
-from python_backend.api.satellite import router as satellite_router
-from python_backend.api.weather import router as weather_router
-from python_backend.api.wind_history import router as wind_history_router
-from python_backend.api.radiometry import router as radiometry_router
+from backend.api.chat import router as chat_router
+from backend.api.corridor import router as corridor_router
+from backend.api.firms import router as firms_router
+from backend.api.gee import router as gee_router
+from backend.api.satellite import router as satellite_router
+from backend.api.weather import router as weather_router
+from backend.api.wind_history import router as wind_history_router
+from backend.api.radiometry import router as radiometry_router
 
 app = FastAPI(
     title="Exur Atmospheric Intelligence Platform",

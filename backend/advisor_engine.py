@@ -7,8 +7,8 @@ into empathetic, highly actionable guidance for citizens and vulnerable patients
 """
 
 from typing import TypedDict
-from python_backend.air_data import CORRIDOR_STATIONS
-from python_backend.industrial_registry import INDUSTRIAL_CLUSTERS
+from backend.air_data import CORRIDOR_STATIONS
+from backend.industrial_registry import INDUSTRIAL_CLUSTERS
 
 class CityBaseline(TypedDict):
     city: str
