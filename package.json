@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "python3 main.py",
-    "py:server": "uvicorn main:app --reload --port 8000",
+    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
