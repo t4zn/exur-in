@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, DragEvent, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import {
@@ -11,6 +11,7 @@ import {
   extractImageLuminance,
   ExifData,
   getBaseline,
+  DEFAULT_BASELINE_I0,
   PixelStats,
   resetBaseline,
   saveBaseline,
@@ -41,12 +42,14 @@ import { getGeeOrbitalAnchorForCoordinate } from "@/lib/earthEngine";
 type Overrides = { fNumber?: number; iso?: number; exposureTime?: number };
 type ImageState = { url: string; name: string; size: number; isDemo?: boolean };
 
+const demoDate = new Date("2025-05-15T12:00:00Z");
+
 const demoExif: ExifData = {
   hasExif: true, warnings: [],
   parsed: {
     make: "Sony", model: "ILCE-7M4", fNumber: 5.6, iso: 100, exposureTime: 0.001,
-    exposureTimeDisplay: "1/1000s (0.001s)", dateTimeOriginal: new Date(),
-    dateTimeOriginalDisplay: new Date().toLocaleString(), software: "ILCE-7M4 firmware",
+    exposureTimeDisplay: "1/1000s (0.001s)", dateTimeOriginal: demoDate,
+    dateTimeOriginalDisplay: "2025-05-15 12:00:00 UTC", software: "ILCE-7M4 firmware",
     gpsDisplay: "28.6139°, 77.2090°", gpsLatitude: 28.6139, gpsLongitude: 77.209,
   },
 };
@@ -58,7 +61,7 @@ function Stat({ label, value, detail }: { label: string; value: string; detail?:
 
 export default function RadiometryPage() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [baseline, setBaseline] = useState(getBaseline);
+  const [baseline, setBaseline] = useState(DEFAULT_BASELINE_I0);
   const [image, setImage] = useState<ImageState>({ url: demoUrl, name: "clear-sky-demo.svg", size: 4.8 * 1024 * 1024, isDemo: true });
   const [exif, setExif] = useState<ExifData>(demoExif);
   const [stats, setStats] = useState<PixelStats>({ avgLuminance: 164, r: 130, g: 165, b: 190, sampleCount: 60000, estimatedSkyPercentage: 89, luminanceStdDev: 45, darkPixelPercentage: 2, clippedPixelPercentage: 0, dynamicRange: 180, upperBrightNeutralPercentage: 4, upperLuminanceStdDev: 35, brightnessGradient: 20 });
@@ -67,12 +70,20 @@ export default function RadiometryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showCalibration, setShowCalibration] = useState(false);
-  const [calibrationValue, setCalibrationValue] = useState(() => String(getBaseline()));
+  const [calibrationValue, setCalibrationValue] = useState(() => String(DEFAULT_BASELINE_I0));
   const [showManual, setShowManual] = useState(false);
   const [vision, setVision] = useState<VisionResult | null>(null);
   const [visionLoading, setVisionLoading] = useState(false);
   const [groundTruth, setGroundTruth] = useState<GroundTruthResult>(() => getPresetGroundTruth(28.6139, 77.209));
   const [groundTruthLoading, setGroundTruthLoading] = useState(false);
+
+  useEffect(() => {
+    const saved = getBaseline();
+    if (saved !== DEFAULT_BASELINE_I0) {
+      setBaseline(saved);
+      setCalibrationValue(String(saved));
+    }
+  }, []);
   const [observationLocation, setObservationLocation] = useState<ObservationLocation | null>(null);
   const [locationState, setLocationState] = useState<"idle" | "detecting" | "granted" | "denied" | "error" | "unsupported">("idle");
   const [sceneValidation, setSceneValidation] = useState<SceneValidationResult>({
@@ -642,18 +653,18 @@ export default function RadiometryPage() {
                     </div>
                   </div>
                 )}
-                <div className="aq-hero">
+                <div className="aq-hero" suppressHydrationWarning>
                   <div>
                     <span>Indicative AQI</span>
-                    <strong>{air.aqi}</strong>
+                    <strong suppressHydrationWarning>{air.aqi}</strong>
                     <small style={{ display: "block", fontSize: "11px", color: "var(--color-ink-muted-48)", marginTop: "2px" }}>
                       Indicative proxy · Not reference-grade
                     </small>
                   </div>
                   <div>
                     <span>PM2.5 mass proxy</span>
-                    <strong>{air.pm25Proxy} <small>µg/m³</small></strong>
-                    <em>AOD τ {air.tau.toFixed(3)}</em>
+                    <strong suppressHydrationWarning>{air.pm25Proxy} <small>µg/m³</small></strong>
+                    <em suppressHydrationWarning>AOD τ {air.tau.toFixed(3)}</em>
                   </div>
                 </div>
                 <div className="aq-scale"><i /><i /><i /><i /><i /><i /></div>

@@ -55,7 +55,7 @@ export interface VisionResult {
   fallbackReason?: string;
 }
 
-export const MAX_CORROBORATION_DISTANCE_KM = 50;
+export const MAX_CORROBORATION_DISTANCE_KM = 25;
 
 export const KNOWN_CITIES: Record<string, { name: string; lat: number; lon: number }> = {
   "indore": { name: "Vijay Nagar, Indore", lat: 22.7533, lon: 75.8937 },

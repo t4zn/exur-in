@@ -411,8 +411,24 @@ export default function AodMap({
 
     return () => {
       isCancelled = true;
+      markersRef.current.forEach((m) => {
+        try {
+          m.closeTooltip();
+          m.remove();
+        } catch (_) {}
+      });
+      markersRef.current = [];
+      fireMarkersRef.current.forEach((m) => {
+        try {
+          m.closeTooltip();
+          m.remove();
+        } catch (_) {}
+      });
+      fireMarkersRef.current = [];
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch (_) {}
         mapInstanceRef.current = null;
         setMapReady(false);
       }
@@ -590,6 +606,16 @@ export default function AodMap({
 
       markersRef.current.push(marker);
     });
+
+    return () => {
+      markersRef.current.forEach((m) => {
+        try {
+          m.closeTooltip();
+          m.remove();
+        } catch (_) {}
+      });
+      markersRef.current = [];
+    };
   }, [mapReady, selectedRegion, hoveredRegion, onSectorSelect, derivedAqiMap]);
 
   // Sync external selectedSectorId prop
@@ -634,6 +660,16 @@ export default function AodMap({
 
       fireMarkersRef.current.push(circle);
     });
+
+    return () => {
+      fireMarkersRef.current.forEach((m) => {
+        try {
+          m.closeTooltip();
+          m.remove();
+        } catch (_) {}
+      });
+      fireMarkersRef.current = [];
+    };
   }, [mapReady, fires, showFires]);
 
   // ─── Quick Jump to Region ────────────────────────────────────────────────
