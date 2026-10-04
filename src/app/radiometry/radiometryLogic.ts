@@ -561,9 +561,13 @@ export function calculateRadiometry(
   overrides: { fNumber?: number; iso?: number; exposureTime?: number },
   observationContext?: { latitude?: number | null; longitude?: number | null; dateTimeOriginal?: Date | null }
 ) {
-  const fNumber = overrides.fNumber ?? exif.parsed.fNumber ?? 2.8;
-  const iso = overrides.iso ?? exif.parsed.iso ?? 100;
-  const exposureTime = overrides.exposureTime ?? exif.parsed.exposureTime ?? 0.002;
+  const fNumber = overrides.fNumber ?? exif.parsed.fNumber ?? null;
+  const iso = overrides.iso ?? exif.parsed.iso ?? null;
+  const exposureTime = overrides.exposureTime ?? exif.parsed.exposureTime ?? null;
+
+  if (fNumber === null || iso === null || exposureTime === null) {
+    return null;
+  }
 
   // 1. Compute solar elevation and optical air mass
   const solar = computeSolarPosition(
@@ -711,8 +715,8 @@ export function analyzeObservationQuality(
   const exifPenalty = validExif ? 0 : partialExif ? 8 : 15;
   addFactor("Camera metadata", -exifPenalty, partialExif ? "Some camera metadata is missing or incomplete; calibration confidence is reduced." : "Camera metadata is unavailable; default exposure assumptions are being used.", "Camera metadata is present and within plausible ranges.");
 
-  const radiometricRisk = radiometry.opticalDepth > 2 || radiometry.transmittance < 0.1 || radiometry.relativeLuminance / radiometry.baselineI0 < 0.1 || radiometry.relativeLuminance / radiometry.baselineI0 > 1.5 || estimateAirQuality(radiometry.opticalDepth).pm25Proxy > 150;
-  addFactor("Radiometric operating range", radiometricRisk ? -15 : 0, "Radiometric result may be outside the reliable operating range; the calculated value remains unchanged.", "Radiometric result is within the configured operating range.");
+  const radiometricRisk = radiometry ? (radiometry.opticalDepth > 2 || radiometry.transmittance < 0.1 || radiometry.relativeLuminance / radiometry.baselineI0 < 0.1 || radiometry.relativeLuminance / radiometry.baselineI0 > 1.5 || estimateAirQuality(radiometry.opticalDepth).pm25Proxy > 150) : true;
+  addFactor("Radiometric operating range", radiometricRisk ? -15 : 0, radiometry ? "Radiometric result may be outside the reliable operating range; the calculated value remains unchanged." : "Radiometric telemetry unavailable.", "Radiometric result is within the configured operating range.");
 
   const observationConfidence = Math.max(0, Math.min(100, Math.round(100 + factors.reduce((total, factor) => total + factor.impact, 0))));
   const confidenceLevel = observationConfidence >= OBSERVATION_CONFIDENCE_LEVELS.veryHigh ? "Very high" : observationConfidence >= OBSERVATION_CONFIDENCE_LEVELS.high ? "High" : observationConfidence >= OBSERVATION_CONFIDENCE_LEVELS.moderate ? "Moderate" : observationConfidence >= OBSERVATION_CONFIDENCE_LEVELS.low ? "Low" : "Very low";
@@ -720,8 +724,33 @@ export function analyzeObservationQuality(
 }
 
 export function validateImageAuthenticity(exif: ExifData, stats: PixelStats) {
-  const parsed = exif.parsed; let score = 100; const checks = [{ name: "Camera hardware signature", passed: Boolean(parsed.make && parsed.model), message: parsed.make && parsed.model ? `${parsed.make} ${parsed.model} identified.` : "Camera make and model are missing." }];
-  if (!checks[0].passed) score -= 35; const exposurePassed = Boolean(parsed.fNumber && parsed.iso && parsed.exposureTime && parsed.fNumber >= 1 && parsed.fNumber <= 32 && parsed.iso >= 25 && parsed.iso <= 102400 && parsed.exposureTime > 0 && parsed.exposureTime <= 30); checks.push({ name: "Exposure parameter plausibility", passed: exposurePassed, message: exposurePassed ? "Aperture, ISO, and shutter values are physically plausible." : "Incomplete or implausible exposure telemetry." }); if (!exposurePassed) score -= 35;
+  const parsed = exif.parsed;
+  let score = 100;
+  const checks = [];
+
+  const hasCompleteExif = Boolean(
+    exif.hasExif &&
+    parsed.fNumber != null && !isNaN(parsed.fNumber) &&
+    parsed.iso != null && !isNaN(parsed.iso) &&
+    parsed.exposureTime != null && !isNaN(parsed.exposureTime)
+  );
+
+  checks.push({
+    name: "Missing EXIF Telemetry",
+    passed: hasCompleteExif,
+    message: hasCompleteExif
+      ? "Camera exposure metadata (aperture, ISO, shutter) is present in EXIF."
+      : "Missing EXIF telemetry — image does not contain genuine camera exposure metadata. Estimate cannot be calculated or trusted.",
+  });
+  if (!hasCompleteExif) score -= 35;
+
+  const hardwarePassed = Boolean(parsed.make && parsed.model);
+  checks.push({
+    name: "Camera hardware signature",
+    passed: hardwarePassed,
+    message: hardwarePassed ? `${parsed.make} ${parsed.model} identified.` : "Camera make and model are missing.",
+  });
+  if (!hardwarePassed) score -= 35; const exposurePassed = Boolean(parsed.fNumber && parsed.iso && parsed.exposureTime && parsed.fNumber >= 1 && parsed.fNumber <= 32 && parsed.iso >= 25 && parsed.iso <= 102400 && parsed.exposureTime > 0 && parsed.exposureTime <= 30); checks.push({ name: "Exposure parameter plausibility", passed: exposurePassed, message: exposurePassed ? "Aperture, ISO, and shutter values are physically plausible." : "Incomplete or implausible exposure telemetry." }); if (!exposurePassed) score -= 35;
   const skyPassed = stats.estimatedSkyPercentage >= 30; checks.push({ name: "Sky region framing", passed: skyPassed, message: skyPassed ? `Adequate sky visible (~${stats.estimatedSkyPercentage}% of frame).` : "Low sky coverage detected; capture more of the sky." }); if (!skyPassed) score -= 25;
   const daylightPassed = !parsed.exposureTime || parsed.exposureTime <= 1 / 60 + 0.0001; checks.push({ name: "Daylight shutter speed", passed: daylightPassed, message: daylightPassed ? "Daylight shutter speed is compatible with the radiometric model." : "Shutter speed is slower than 1/60s and may indicate low-light capture." }); if (!daylightPassed) score -= 15;
   const softwarePassed = !parsed.software || !/(photoshop|gimp|canva|lightroom|snapseed|picsart|midjourney|stable diffusion)/i.test(parsed.software); checks.push({ name: "Post-processing integrity", passed: softwarePassed, message: softwarePassed ? "No known editing signature detected." : `Editing software tag detected: ${parsed.software}.` }); if (!softwarePassed) score -= 25;

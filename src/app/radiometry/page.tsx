@@ -277,20 +277,31 @@ export default function RadiometryPage() {
           dateTimeOriginal: nextExif.parsed.dateTimeOriginal,
         }
       );
-      const nextIsCloudy =
-        validationResult.detectedType === "cloudy_sky" ||
-        nextStats.upperBrightNeutralPercentage > 20 ||
-        (nextStats.avgLuminance > 110 && Math.abs(nextStats.r - nextStats.b) < 22 && nextRadiometry.opticalDepth > 0.45);
-      const nextAir = estimateAirQuality(nextRadiometry.opticalDepth, nextIsCloudy);
+      if (nextRadiometry) {
+        const nextIsCloudy =
+          validationResult.detectedType === "cloudy_sky" ||
+          nextStats.upperBrightNeutralPercentage > 20 ||
+          (nextStats.avgLuminance > 110 && Math.abs(nextStats.r - nextStats.b) < 22 && nextRadiometry.opticalDepth > 0.45);
+        const nextAir = estimateAirQuality(nextRadiometry.opticalDepth, nextIsCloudy);
 
-      void analyzeSkyHazeWithGemini(
-        file,
-        { opticalDepth: nextRadiometry.opticalDepth, aqi: nextAir.aqi },
-        observationLocation?.localityName || "India"
-      )
-        .then((nextVision) => setVision(nextVision))
-        .catch(() => setVision(null))
-        .finally(() => setVisionLoading(false));
+        void analyzeSkyHazeWithGemini(
+          file,
+          { opticalDepth: nextRadiometry.opticalDepth, aqi: nextAir.aqi },
+          observationLocation?.localityName || "India"
+        )
+          .then((nextVision) => setVision(nextVision))
+          .catch(() => setVision(null))
+          .finally(() => setVisionLoading(false));
+      } else {
+        void analyzeSkyHazeWithGemini(
+          file,
+          undefined,
+          observationLocation?.localityName || "India"
+        )
+          .then((nextVision) => setVision(nextVision))
+          .catch(() => setVision(null))
+          .finally(() => setVisionLoading(false));
+      }
     } catch (reason) {
       URL.revokeObjectURL(url);
       setError(reason instanceof Error ? reason.message : "Unable to analyze this image.");
@@ -652,7 +663,24 @@ export default function RadiometryPage() {
                   {air.advisory}
                 </div>
               </Panel>
-            ) : null}
+            ) : (
+              <Panel className="aq-panel">
+                <div className="panel-heading">
+                  <div>
+                    <span className="eyebrow" style={{ color: "#d97706" }}>03 / ATMOSPHERE</span>
+                    <h2>Camera-derived estimate unavailable.</h2>
+                  </div>
+                  <span className="badge-rejected" style={{ background: "#fef3c7", color: "#d97706", borderColor: "#fde68a" }}>MISSING EXIF</span>
+                </div>
+                <div className="rejection-hero">
+                  <div className="rejection-icon" aria-hidden="true" style={{ background: "#fef3c7", color: "#d97706" }}>⚠</div>
+                  <div className="rejection-content">
+                    <h3>Cannot estimate air quality — this photo is missing camera exposure data (EXIF).</h3>
+                    <p className="rejection-advisory">This usually happens with downloaded, screenshotted, or re-shared images. Please upload an original photo taken directly from a camera, or manually enter the camera settings using Edit.</p>
+                  </div>
+                </div>
+              </Panel>
+            )}
 
             {!sceneValidation.sceneValid ? (
               <Panel>
@@ -697,7 +725,18 @@ export default function RadiometryPage() {
                   </small>
                 </div>
               </Panel>
-            ) : null}
+            ) : (
+              <Panel>
+                <div className="panel-heading">
+                  <div><span className="eyebrow">04 / PHYSICS</span><h2>Radiometry result.</h2></div>
+                  <span className="formula-chip" style={{ background: "#fef3c7", color: "#d97706", borderColor: "#fde68a" }}>Unavailable</span>
+                </div>
+                <div className="rejection-placeholder">
+                  <p>Beer–Lambert physical inversion τ = −(1/m) · ln(I / I₀) is suspended.</p>
+                  <small>Camera exposure parameters (Aperture, ISO, Shutter) are required to compute relative radiance.</small>
+                </div>
+              </Panel>
+            )}
 
             {!sceneValidation.sceneValid ? (
               <Panel>

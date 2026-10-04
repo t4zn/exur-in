@@ -585,7 +585,7 @@ async function imageToBase64(file: File) {
 
 export async function analyzeSkyHazeWithGemma(
   file: File,
-  radiometry: { opticalDepth: number; aqi: number },
+  radiometry?: { opticalDepth: number; aqi: number },
   locationName?: string
 ): Promise<VisionResult> {
   try {
@@ -598,8 +598,8 @@ export async function analyzeSkyHazeWithGemma(
       body: JSON.stringify({
         imageBase64: image.data,
         mimeType: image.mimeType,
-        opticalDepth: radiometry.opticalDepth,
-        aqi: radiometry.aqi,
+        opticalDepth: radiometry?.opticalDepth ?? 0.2,
+        aqi: radiometry?.aqi ?? 60,
         locationName: locationName || "India",
       }),
     });
@@ -612,7 +612,7 @@ export async function analyzeSkyHazeWithGemma(
 
     if (!res.success) {
       return {
-        ...syntheticVision(radiometry.opticalDepth, radiometry.aqi),
+        ...syntheticVision(radiometry?.opticalDepth ?? 0.2, radiometry?.aqi ?? 60),
         fallbackReason: res.fallbackReason || "Google Gemma 4 Vision key not configured",
       };
     }
@@ -622,8 +622,8 @@ export async function analyzeSkyHazeWithGemma(
       isSynthetic: false,
       hazeSeverity: res.hazeSeverity || "moderate",
       hazeDescription: res.hazeDescription || "Atmospheric aerosol analysis completed.",
-      estimatedAodTau: res.estimatedAodTau ?? radiometry.opticalDepth,
-      estimatedAqi: res.estimatedAqi ?? radiometry.aqi,
+      estimatedAodTau: res.estimatedAodTau ?? radiometry?.opticalDepth ?? 0.2,
+      estimatedAqi: res.estimatedAqi ?? radiometry?.aqi ?? 60,
       aqiCategory: res.aqiCategory || "Moderate",
       cloudCoveragePercent: res.cloudCoveragePercent ?? 0,
       cloudType: res.cloudType || "Clear",
@@ -635,7 +635,7 @@ export async function analyzeSkyHazeWithGemma(
     };
   } catch (error) {
     return {
-      ...syntheticVision(radiometry.opticalDepth, radiometry.aqi),
+      ...syntheticVision(radiometry?.opticalDepth ?? 0.2, radiometry?.aqi ?? 60),
       fallbackReason: error instanceof Error ? error.message : "Google Gemma 4 vision unavailable.",
     };
   }
