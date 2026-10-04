@@ -488,8 +488,8 @@ export default function AdvisorPage() {
                 display: "flex",
                 alignItems: "center",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.5)")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
             >
               <SidebarIcon />
             </button>
@@ -650,7 +650,7 @@ export default function AdvisorPage() {
                     marginLeft: "4px",
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#ff453a")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.35)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
                 >
                   ✕
                 </button>
@@ -741,8 +741,8 @@ export default function AdvisorPage() {
                   display: "flex",
                   alignItems: "center",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)")}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
               >
                 <SidebarIcon />
               </button>
@@ -915,8 +915,8 @@ export default function AdvisorPage() {
                 alignItems: "center",
                 gap: "4px",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
             >
               <span>+ New</span>
             </button>
@@ -1341,13 +1341,13 @@ export default function AdvisorPage() {
                                     e.currentTarget.style.backgroundColor =
                                       "rgba(41, 151, 255, 0.16)";
                                     e.currentTarget.style.borderColor = "rgba(41, 151, 255, 0.4)";
-                                    e.currentTarget.style.color = "#ffffff";
+                                    e.currentTarget.style.color = "#1d4ed8";
                                   }}
                                   onMouseLeave={(e) => {
                                     e.currentTarget.style.backgroundColor =
                                       "rgba(41, 151, 255, 0.06)";
                                     e.currentTarget.style.borderColor = "rgba(41, 151, 255, 0.2)";
-                                    e.currentTarget.style.color = "rgba(255, 255, 255, 0.85)";
+                                    e.currentTarget.style.color = "#334155";
                                   }}
                                 >
                                   {fu} &rarr;
@@ -1416,7 +1416,7 @@ export default function AdvisorPage() {
                 transition: "color 0.15s ease",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "#2997ff")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.45)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
             >
               ✦
             </button>
