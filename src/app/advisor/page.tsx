@@ -840,7 +840,7 @@ export default function AdvisorPage() {
                   >
                     <div style={{ fontWeight: 600 }}>✦ Exur Intelligence (Auto)</div>
                     <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>
-                      Gemma 4 with sub-second LPU acceleration
+                      Gemma 4 first, then Groq if configured
                     </div>
                   </div>
 
@@ -858,7 +858,7 @@ export default function AdvisorPage() {
                       color: "#ffffff",
                     }}
                   >
-                    <div style={{ fontWeight: 600 }}>⚡ Groq LPU (Qwen 3.8 27B)</div>
+                    <div style={{ fontWeight: 600 }}>⚡ Groq LPU (Llama 3.3 70B)</div>
                     <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>
                       Ultra-low latency streaming inference
                     </div>

@@ -82,8 +82,8 @@ export async function POST(req: NextRequest) {
     }
 
     const latestMessage = messages[messages.length - 1].content || "";
-    const gemmaKey = process.env.GEMMA_API_KEY || process.env.GEMINI_API_KEY;
-    const groqKey = process.env.GROQ_API_KEY;
+    const gemmaKey = (process.env.GEMMA_API_KEY || process.env.GEMINI_API_KEY)?.trim();
+    const groqKey = process.env.GROQ_API_KEY?.trim();
     const followUps = getSuggestedFollowUps(latestMessage);
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -93,7 +93,9 @@ export async function POST(req: NextRequest) {
       const encoder = new TextEncoder();
 
       // 1. If Gemma is preferred or in auto mode with Gemma key:
-      if (gemmaKey && (modelPreference === "gemma" || !groqKey)) {
+      // Auto prefers the configured Gemma provider. A present Groq key must not
+      // suppress Gemma; invalid or stale keys otherwise route users to fallback.
+      if (gemmaKey && (modelPreference === "gemma" || modelPreference === "auto" || !groqKey)) {
         try {
           const modelName = "gemma-4-26b-a4b-it";
           const isOAuthBearer = gemmaKey.startsWith("ya29.");
@@ -101,8 +103,8 @@ export async function POST(req: NextRequest) {
           if (isOAuthBearer) authHeaders["Authorization"] = `Bearer ${gemmaKey}`;
 
           const gemmaUrl = isOAuthBearer
-            ? `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent`
-            : `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?key=${encodeURIComponent(gemmaKey)}`;
+            ? `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?alt=sse`
+            : `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?key=${encodeURIComponent(gemmaKey)}&alt=sse`;
 
           const gemmaContents = messages.map((m) => ({
             role: m.role === "assistant" ? "model" : "user",
@@ -139,6 +141,49 @@ export async function POST(req: NextRequest) {
             const customReadable = new ReadableStream({
               async start(controller) {
                 let buffer = "";
+                let emittedText = false;
+                let streamClosed = false;
+                const closeStream = () => {
+                  if (streamClosed) return;
+                  streamClosed = true;
+                  try {
+                    controller.close();
+                  } catch {
+                    // The client may have already closed the response stream.
+                  }
+                };
+                const enqueueEvent = (event: { token?: string; done?: boolean; provider?: string; suggestedFollowUps?: string[]; hasContent?: boolean }) => {
+                  if (streamClosed) return;
+                  try {
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+                  } catch {
+                    streamClosed = true;
+                  }
+                };
+                const emitGemmaChunk = (raw: string) => {
+                  if (streamClosed) return;
+                  const trimmed = raw.trim().replace(/^data:\s*/, "").replace(/^,\s*/, "");
+                  if (!trimmed || trimmed === "[DONE]" || trimmed === "[") return;
+                  const candidates = trimmed.startsWith("[") && trimmed.endsWith("]")
+                    ? (() => {
+                        try { return JSON.parse(trimmed) as Array<{ candidates?: Array<{ content?: { parts?: Array<{ text?: string; thought?: boolean }> } }> }>; }
+                        catch { return []; }
+                      })()
+                    : [(() => {
+                        try { return JSON.parse(trimmed) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string; thought?: boolean }> } }> }; }
+                        catch { return null; }
+                      })()];
+                  for (const parsed of candidates) {
+                    if (!parsed) continue;
+                    const parts = parsed.candidates?.[0]?.content?.parts || [];
+                    for (const part of parts) {
+                      if (part.text && !part.thought) {
+                        emittedText = true;
+                        enqueueEvent({ token: part.text });
+                      }
+                    }
+                  }
+                };
                 try {
                   while (true) {
                     const { done, value } = await reader.read();
@@ -146,53 +191,27 @@ export async function POST(req: NextRequest) {
 
                     buffer += decoder.decode(value, { stream: true });
 
-                    // Parse JSON objects/chunks from stream
-                    // Google stream returns JSON array chunks or objects
                     const jsonChunks = buffer.split(/\r?\n/);
                     buffer = jsonChunks.pop() || "";
-
-                    for (const line of jsonChunks) {
-                      const trimmed = line.trim().replace(/^,\s*/, "").replace(/^\[/, "").replace(/\]$/, "");
-                      if (!trimmed) continue;
-                      try {
-                        const parsed = JSON.parse(trimmed);
-                        const parts = parsed.candidates?.[0]?.content?.parts || [];
-                        for (const part of parts) {
-                          // Only stream actual text response, ignore internal thought reasoning
-                          if (part.text && !part.thought) {
-                            controller.enqueue(
-                              encoder.encode(`data: ${JSON.stringify({ token: part.text })}\n\n`)
-                            );
-                          }
-                        }
-                      } catch {
-                        // ignore incomplete buffer
-                      }
-                    }
+                    for (const line of jsonChunks) emitGemmaChunk(line);
                   }
 
-                  controller.enqueue(
-                    encoder.encode(
-                      `data: ${JSON.stringify({
-                        done: true,
-                        provider: `Google Gemma 4 (${modelName})`,
-                        suggestedFollowUps: followUps,
-                      })}\n\n`
-                    )
-                  );
-                  controller.close();
+                  if (buffer.trim()) emitGemmaChunk(buffer);
+                  enqueueEvent({
+                    done: true,
+                    provider: `Google Gemma 4 (${modelName})`,
+                    suggestedFollowUps: followUps,
+                    hasContent: emittedText,
+                  });
+                  closeStream();
                 } catch (err) {
                   console.warn("[Stream API] Gemma stream ended unexpectedly:", err);
-                  controller.enqueue(
-                    encoder.encode(
-                      `data: ${JSON.stringify({
-                        done: true,
-                        provider: "Exur fallback after Gemma stream interruption",
-                        suggestedFollowUps: followUps,
-                      })}\n\n`
-                    )
-                  );
-                  controller.close();
+                  enqueueEvent({
+                    done: true,
+                    provider: "Exur fallback after Gemma stream interruption",
+                    suggestedFollowUps: followUps,
+                  });
+                  closeStream();
                 }
               },
             });
@@ -213,7 +232,7 @@ export async function POST(req: NextRequest) {
       // 2. Groq LPU Streaming (Sub-second fallback)
       if (groqKey && modelPreference !== "gemma") {
         try {
-          const groqModel = "qwen/qwen3.8-27b";
+          const groqModel = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
           const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -325,7 +344,7 @@ export async function POST(req: NextRequest) {
               encoder.encode(
                 `data: ${JSON.stringify({
                   done: true,
-                  provider: "Google Gemma 4 Atmospheric Physics Baseline",
+                  provider: "Local Atmospheric Physics Fallback",
                   suggestedFollowUps: followUps,
                 })}\n\n`
               )
@@ -353,7 +372,7 @@ export async function POST(req: NextRequest) {
     let providerUsed = "Google Gemma 4 Atmospheric Intelligence Engine";
 
     // 1. Google Gemma 4 (26B / 31B Open Weights)
-    if (gemmaKey && (modelPreference === "gemma" || !aiResponseText)) {
+    if (gemmaKey && (modelPreference === "gemma" || modelPreference === "auto" || !groqKey)) {
       const gemmaModels = ["gemma-4-26b-a4b-it", "gemma-4-31b-it"];
       for (const modelName of gemmaModels) {
         if (aiResponseText) break;
@@ -411,7 +430,7 @@ export async function POST(req: NextRequest) {
     // 2. Groq LPU (Sub-second fallback)
     if (groqKey && !aiResponseText && modelPreference !== "gemma") {
       try {
-        const groqModel = "qwen/qwen3.8-27b";
+        const groqModel = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
         const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -443,7 +462,7 @@ export async function POST(req: NextRequest) {
     // 3. Fallback: Local Deep Atmospheric Reasoning Engine
     if (!aiResponseText) {
       aiResponseText = generateAtmosphericAdvice(latestMessage);
-      providerUsed = "Google Gemma 4 Atmospheric Physics Baseline";
+      providerUsed = "Local Atmospheric Physics Fallback";
     }
 
     return NextResponse.json({
