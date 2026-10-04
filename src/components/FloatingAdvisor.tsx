@@ -219,13 +219,11 @@ export default function FloatingAdvisor() {
             gap: "10px",
             padding: "10px 18px",
             borderRadius: "9999px",
-            backgroundColor: "rgba(18, 18, 22, 0.9)",
-            color: "#ffffff",
-            border: "1px solid rgba(255, 255, 255, 0.16)",
-            backdropFilter: "blur(24px) saturate(180%)",
-            WebkitBackdropFilter: "blur(24px) saturate(180%)",
+            backgroundColor: "#ffffff",
+            color: "#1f2937",
+            border: "1px solid #dbe2ea",
             boxShadow:
-              "0 12px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(41, 151, 255, 0.28)",
+              "0 10px 30px rgba(15, 23, 42, 0.16)",
             cursor: "pointer",
             fontSize: "13px",
             fontWeight: 600,
@@ -237,7 +235,7 @@ export default function FloatingAdvisor() {
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.16)";
+            e.currentTarget.style.borderColor = "#dbe2ea";
           }}
         >
           {/* Apple Intelligence Aura Glyph */}
@@ -266,13 +264,11 @@ export default function FloatingAdvisor() {
             maxWidth: "calc(100vw - 32px)",
             height: "620px",
             maxHeight: "calc(100vh - 40px)",
-            backgroundColor: "rgba(18, 18, 22, 0.95)",
-            backdropFilter: "blur(32px) saturate(200%)",
-            WebkitBackdropFilter: "blur(32px) saturate(200%)",
-            border: "1px solid rgba(255, 255, 255, 0.16)",
+            backgroundColor: "#ffffff",
+            border: "1px solid #dbe2ea",
             borderRadius: "24px",
             boxShadow:
-              "0 28px 72px rgba(0, 0, 0, 0.75), 0 0 36px rgba(41, 151, 255, 0.16)",
+              "0 22px 60px rgba(15, 23, 42, 0.18)",
             zIndex: 1000,
             display: "flex",
             flexDirection: "column",
@@ -284,11 +280,11 @@ export default function FloatingAdvisor() {
           <div
             style={{
               padding: "14px 18px",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+              borderBottom: "1px solid #e5e7eb",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              backgroundColor: "rgba(255, 255, 255, 0.02)",
+              backgroundColor: "#f8fafc",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
@@ -301,7 +297,7 @@ export default function FloatingAdvisor() {
                     "conic-gradient(from 180deg, #00f2fe, #4facfe, #0071e3, #f093fb, #00f2fe)",
                 }}
               />
-              <span style={{ fontSize: "14px", fontWeight: 650, color: "#ffffff" }}>
+              <span style={{ fontSize: "14px", fontWeight: 650, color: "#1f2937" }}>
                 Exur
               </span>
               <span
@@ -324,12 +320,12 @@ export default function FloatingAdvisor() {
                 href="/advisor"
                 title="Open Fullscreen ChatGPT Mode"
                 style={{
-                  color: "rgba(255, 255, 255, 0.6)",
+                  color: "#475569",
                   textDecoration: "none",
                   fontSize: "12px",
                   padding: "4px 8px",
                   borderRadius: "6px",
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: "#eef2f7",
                   display: "flex",
                   alignItems: "center",
                   gap: "4px",
@@ -345,7 +341,7 @@ export default function FloatingAdvisor() {
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "rgba(255, 255, 255, 0.5)",
+                  color: "#64748b",
                   cursor: "pointer",
                   padding: "4px",
                   fontSize: "14px",
@@ -384,7 +380,7 @@ export default function FloatingAdvisor() {
                   style={{
                     fontSize: "15px",
                     fontWeight: 650,
-                    color: "#ffffff",
+                    color: "#1f2937",
                     marginBottom: "6px",
                   }}
                 >
@@ -393,7 +389,7 @@ export default function FloatingAdvisor() {
                 <p
                   style={{
                     fontSize: "13px",
-                    color: "rgba(255, 255, 255, 0.55)",
+                    color: "#64748b",
                     lineHeight: 1.45,
                     marginBottom: "20px",
                   }}
@@ -410,7 +406,7 @@ export default function FloatingAdvisor() {
                     borderRadius: "14px",
                     padding: "12px 14px",
                     textAlign: "left",
-                    color: "rgba(255, 255, 255, 0.9)",
+                    color: "#334155",
                     fontSize: "12px",
                     cursor: "pointer",
                     lineHeight: 1.4,
@@ -442,12 +438,12 @@ export default function FloatingAdvisor() {
                     <div
                       style={{
                         maxWidth: "85%",
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        backgroundColor: "#e8f0fe",
+                        border: "1px solid #c7d7f5",
                         borderRadius: "18px 18px 4px 18px",
                         padding: "10px 14px",
                         fontSize: "14px",
-                        color: "#ffffff",
+                        color: "#1f2937",
                         lineHeight: 1.45,
                         wordBreak: "break-word",
                       }}
@@ -459,7 +455,7 @@ export default function FloatingAdvisor() {
                       <div
                         style={{
                           fontSize: "11px",
-                          color: "rgba(255, 255, 255, 0.4)",
+                          color: "#64748b",
                           marginBottom: "4px",
                           display: "flex",
                           alignItems: "center",
@@ -482,8 +478,8 @@ export default function FloatingAdvisor() {
                               border: "1px solid rgba(255,255,255,0.12)",
                               borderRadius: "8px",
                               padding: "4px 8px",
-                              color: speakingMessageId === m.id ? "#2997ff" : "rgba(255,255,255,0.55)",
-                              background: "rgba(255,255,255,0.04)",
+                              color: speakingMessageId === m.id ? "#1d4ed8" : "#64748b",
+                              background: "#f1f5f9",
                               cursor: "pointer",
                               fontSize: "11px",
                             }}
@@ -520,7 +516,7 @@ export default function FloatingAdvisor() {
                                   borderRadius: "12px",
                                   padding: "4px 10px",
                                   fontSize: "11px",
-                                  color: "rgba(255, 255, 255, 0.85)",
+                                  color: "#334155",
                                   cursor: "pointer",
                                   textAlign: "left",
                                 }}
@@ -542,8 +538,8 @@ export default function FloatingAdvisor() {
           <div
             style={{
               padding: "12px 14px 14px",
-              borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-              backgroundColor: "rgba(14, 14, 18, 0.9)",
+              borderTop: "1px solid #e5e7eb",
+              backgroundColor: "#f8fafc",
             }}
           >
             <div
@@ -551,8 +547,8 @@ export default function FloatingAdvisor() {
                 display: "flex",
                 alignItems: "flex-end",
                 gap: "8px",
-                backgroundColor: "rgba(255, 255, 255, 0.06)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
+                backgroundColor: "#ffffff",
+                border: "1px solid #dbe2ea",
                 borderRadius: "20px",
                 padding: "6px 8px 6px 14px",
               }}
@@ -574,7 +570,7 @@ export default function FloatingAdvisor() {
                   background: "transparent",
                   border: "none",
                   outline: "none",
-                  color: "#ffffff",
+                  color: "#1f2937",
                   fontSize: "14px",
                   lineHeight: 1.4,
                   maxHeight: "120px",
@@ -604,7 +600,7 @@ export default function FloatingAdvisor() {
                     style={{
                       width: "10px",
                       height: "10px",
-                      backgroundColor: "#0d0d0f",
+                      backgroundColor: "#1f2937",
                       borderRadius: "2px",
                     }}
                   />
@@ -618,7 +614,7 @@ export default function FloatingAdvisor() {
                     width: "30px",
                     height: "30px",
                     borderRadius: "50%",
-                    backgroundColor: inputQuery.trim() ? "#0071e3" : "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: inputQuery.trim() ? "#2563eb" : "#dbe2ea",
                     border: "none",
                     display: "flex",
                     alignItems: "center",

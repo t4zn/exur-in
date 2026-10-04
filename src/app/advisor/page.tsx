@@ -423,8 +423,8 @@ export default function AdvisorPage() {
         height: "100vh",
         width: "100vw",
         overflow: "hidden",
-        backgroundColor: "#0d0d0f",
-        color: "#ffffff",
+        backgroundColor: "#f7f8fa",
+        color: "#1f2933",
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif",
       }}
@@ -437,10 +437,10 @@ export default function AdvisorPage() {
           width: isSidebarOpen ? "260px" : "0px",
           minWidth: isSidebarOpen ? "260px" : "0px",
           height: "100%",
-          backgroundColor: "rgba(18, 18, 22, 0.95)",
+          backgroundColor: "#ffffff",
           backdropFilter: "blur(30px)",
           WebkitBackdropFilter: "blur(30px)",
-          borderRight: "1px solid rgba(255, 255, 255, 0.08)",
+          borderRight: "1px solid #e5e7eb",
           display: "flex",
           flexDirection: "column",
           transition: "all 0.28s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -481,7 +481,7 @@ export default function AdvisorPage() {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgba(255, 255, 255, 0.5)",
+                color: "#64748b",
                 cursor: "pointer",
                 padding: "6px",
                 borderRadius: "6px",
@@ -507,7 +507,7 @@ export default function AdvisorPage() {
               backgroundColor: "rgba(255, 255, 255, 0.08)",
               border: "1px solid rgba(255, 255, 255, 0.12)",
               borderRadius: "10px",
-              color: "#ffffff",
+              color: "#1f2937",
               fontSize: "13px",
               fontWeight: 600,
               cursor: "pointer",
@@ -529,7 +529,7 @@ export default function AdvisorPage() {
             <span
               style={{
                 fontSize: "11px",
-                color: "rgba(255, 255, 255, 0.4)",
+                color: "#64748b",
                 padding: "2px 6px",
                 borderRadius: "4px",
                 backgroundColor: "rgba(255, 255, 255, 0.06)",
@@ -554,7 +554,7 @@ export default function AdvisorPage() {
               borderRadius: "8px",
               padding: "7px 10px",
               fontSize: "12px",
-              color: "#ffffff",
+              color: "#1f2937",
               outline: "none",
             }}
           />
@@ -575,7 +575,7 @@ export default function AdvisorPage() {
             style={{
               fontSize: "11px",
               fontWeight: 650,
-              color: "rgba(255, 255, 255, 0.35)",
+              color: "#94a3b8",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               padding: "8px 10px 4px",
@@ -624,7 +624,7 @@ export default function AdvisorPage() {
                   <span
                     style={{
                       fontSize: "13px",
-                      color: isActive ? "#ffffff" : "rgba(255, 255, 255, 0.75)",
+                      color: isActive ? "#1d4ed8" : "#475569",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -642,7 +642,7 @@ export default function AdvisorPage() {
                   style={{
                     background: "none",
                     border: "none",
-                    color: "rgba(255, 255, 255, 0.35)",
+                    color: "#94a3b8",
                     cursor: "pointer",
                     fontSize: "13px",
                     padding: "2px 4px",
@@ -663,12 +663,12 @@ export default function AdvisorPage() {
         <div
           style={{
             padding: "14px",
-            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            borderTop: "1px solid #e5e7eb",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: "12px",
-            color: "rgba(255, 255, 255, 0.45)",
+            color: "#64748b",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -715,12 +715,12 @@ export default function AdvisorPage() {
         <header
           style={{
             height: "52px",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+            borderBottom: "1px solid #e5e7eb",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             padding: "0 18px",
-            backgroundColor: "rgba(13, 13, 15, 0.8)",
+            backgroundColor: "rgba(255, 255, 255, 0.94)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
             zIndex: 30,
@@ -734,7 +734,7 @@ export default function AdvisorPage() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: "#475569",
                   cursor: "pointer",
                   padding: "6px",
                   borderRadius: "6px",
@@ -756,11 +756,11 @@ export default function AdvisorPage() {
                   display: "flex",
                   alignItems: "center",
                   gap: "7px",
-                  backgroundColor: "rgba(255, 255, 255, 0.06)",
+                  backgroundColor: "#f1f5f9",
                   border: "1px solid rgba(255, 255, 255, 0.12)",
                   borderRadius: "8px",
                   padding: "6px 12px",
-                  color: "#ffffff",
+                  color: "#1f2937",
                   fontSize: "13px",
                   fontWeight: 600,
                   cursor: "pointer",
@@ -815,11 +815,11 @@ export default function AdvisorPage() {
                       cursor: "pointer",
                       fontSize: "12px",
                       backgroundColor: selectedModel === "gemma" ? "rgba(41, 151, 255, 0.15)" : "transparent",
-                      color: "#ffffff",
+                      color: "#1f2937",
                     }}
                   >
                     <div style={{ fontWeight: 600 }}>💎 Google Gemma 4 (26B Open Weights)</div>
-                    <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>
+                    <div style={{ fontSize: "11px", color: "#64748b" }}>
                       Deep reasoning with official Gemma 4 weights
                     </div>
                   </div>
@@ -835,11 +835,11 @@ export default function AdvisorPage() {
                       cursor: "pointer",
                       fontSize: "12px",
                       backgroundColor: selectedModel === "auto" ? "rgba(41, 151, 255, 0.15)" : "transparent",
-                      color: "#ffffff",
+                      color: "#1f2937",
                     }}
                   >
                     <div style={{ fontWeight: 600 }}>✦ Exur Intelligence (Auto)</div>
-                    <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>
+                    <div style={{ fontSize: "11px", color: "#64748b" }}>
                       Gemma 4 first, then Groq if configured
                     </div>
                   </div>
@@ -855,11 +855,11 @@ export default function AdvisorPage() {
                       cursor: "pointer",
                       fontSize: "12px",
                       backgroundColor: selectedModel === "groq" ? "rgba(41, 151, 255, 0.15)" : "transparent",
-                      color: "#ffffff",
+                      color: "#1f2937",
                     }}
                   >
                     <div style={{ fontWeight: 600 }}>⚡ Groq LPU (Llama 3.3 70B)</div>
-                    <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.5)" }}>
+                    <div style={{ fontSize: "11px", color: "#64748b" }}>
                       Ultra-low latency streaming inference
                     </div>
                   </div>
@@ -871,7 +871,7 @@ export default function AdvisorPage() {
             <span
               style={{
                 fontSize: "13px",
-                color: "rgba(255, 255, 255, 0.5)",
+                color: "#64748b",
                 maxWidth: "280px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -906,7 +906,7 @@ export default function AdvisorPage() {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgba(255, 255, 255, 0.7)",
+                color: "#475569",
                 cursor: "pointer",
                 padding: "6px 10px",
                 borderRadius: "6px",
@@ -925,11 +925,11 @@ export default function AdvisorPage() {
               href="/"
               style={{
                 fontSize: "12px",
-                color: "rgba(255, 255, 255, 0.6)",
+                color: "#475569",
                 textDecoration: "none",
                 padding: "6px 10px",
                 borderRadius: "6px",
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: "#f1f5f9",
               }}
             >
               Exit &larr;
@@ -950,7 +950,7 @@ export default function AdvisorPage() {
             padding: "24px 20px 140px",
           }}
         >
-          <div style={{ width: "100%", maxWidth: "780px" }}>
+          <div style={{ width: "100%", maxWidth: "860px" }}>
             {/* ─── Empty State: Apple Intelligence Welcome Screen ────────────── */}
             {messages.length === 0 && (
               <div
@@ -1045,13 +1045,13 @@ export default function AdvisorPage() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "rgba(255, 255, 255, 0.65)",
+                    color: "#667085",
                     maxWidth: "580px",
                     lineHeight: 1.5,
                     marginBottom: "36px",
                   }}
                 >
-                  Powered by <strong style={{ color: "#ffffff" }}>Google Gemma 4</strong> through the Gemini API.
+                  Powered by                   <strong style={{ color: "#1f2933" }}>Google Gemma 4</strong> through the Gemini API.
                   Translating ISRO INSAT-3DS satellite radiometry, CPCB monitoring feeds,
                   and Indore vs Delhi-NCR microclimates into compassionate, actionable citizen intelligence.
                 </p>
@@ -1071,8 +1071,8 @@ export default function AdvisorPage() {
                       key={idx}
                       onClick={() => handleSendMessage(t.prompt)}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e2e8f0",
                         borderRadius: "16px",
                         padding: "16px 18px",
                         cursor: "pointer",
@@ -1111,7 +1111,7 @@ export default function AdvisorPage() {
                         style={{
                           fontSize: "14px",
                           fontWeight: 600,
-                          color: "#ffffff",
+                          color: "#1f2937",
                           lineHeight: 1.35,
                         }}
                       >
@@ -1144,12 +1144,12 @@ export default function AdvisorPage() {
                     <div
                       style={{
                         maxWidth: "80%",
-                        backgroundColor: "rgba(255, 255, 255, 0.09)",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        backgroundColor: "#e8f0fe",
+                        border: "1px solid #c7d7f5",
                         borderRadius: "20px 20px 4px 20px",
                         padding: "12px 18px",
                         fontSize: "15px",
-                        color: "#ffffff",
+                        color: "#1f2937",
                         lineHeight: 1.5,
                         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
                         whiteSpace: "pre-wrap",
@@ -1185,15 +1185,15 @@ export default function AdvisorPage() {
                             marginBottom: "6px",
                           }}
                         >
-                          <span style={{ fontSize: "13px", fontWeight: 650, color: "#ffffff" }}>
+                          <span style={{ fontSize: "13px", fontWeight: 650, color: "#1f2937" }}>
                             Exur
                           </span>
                           {m.provider && (
                             <span
                               style={{
                                 fontSize: "11px",
-                                color: "rgba(255, 255, 255, 0.4)",
-                                backgroundColor: "rgba(255, 255, 255, 0.06)",
+                                color: "#64748b",
+                                backgroundColor: "#f1f5f9",
                                 padding: "1px 6px",
                                 borderRadius: "4px",
                               }}
@@ -1201,7 +1201,7 @@ export default function AdvisorPage() {
                               {m.provider}
                             </span>
                           )}
-                          <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.3)" }}>
+                          <span style={{ fontSize: "11px", color: "#94a3b8" }}>
                             {m.timestamp}
                           </span>
                         </div>
@@ -1226,7 +1226,7 @@ export default function AdvisorPage() {
                               style={{
                                 background: "none",
                                 border: "none",
-                                color: copiedId === m.id ? "#30d158" : "rgba(255, 255, 255, 0.45)",
+                                color: copiedId === m.id ? "#15803d" : "#64748b",
                                 fontSize: "12px",
                                 cursor: "pointer",
                                 display: "flex",
@@ -1234,13 +1234,13 @@ export default function AdvisorPage() {
                                 gap: "4px",
                                 padding: "4px 8px",
                                 borderRadius: "6px",
-                                backgroundColor: "rgba(255, 255, 255, 0.04)",
+                                backgroundColor: "#f1f5f9",
                                 transition: "all 0.15s ease",
                               }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
                               onMouseLeave={(e) =>
                                 (e.currentTarget.style.color =
-                                  copiedId === m.id ? "#30d158" : "rgba(255, 255, 255, 0.45)")
+                                  copiedId === m.id ? "#15803d" : "#64748b")
                               }
                             >
                               <span>{copiedId === m.id ? "✓" : "📋"}</span>
@@ -1253,7 +1253,7 @@ export default function AdvisorPage() {
                               style={{
                                 background: "none",
                                 border: "none",
-                                color: "rgba(255, 255, 255, 0.45)",
+                                color: "#64748b",
                                 fontSize: "12px",
                                 cursor: "pointer",
                                 display: "flex",
@@ -1261,12 +1261,12 @@ export default function AdvisorPage() {
                                 gap: "4px",
                                 padding: "4px 8px",
                                 borderRadius: "6px",
-                                backgroundColor: "rgba(255, 255, 255, 0.04)",
+                                backgroundColor: "#f1f5f9",
                                 transition: "all 0.15s ease",
                               }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
                               onMouseLeave={(e) =>
-                                (e.currentTarget.style.color = "rgba(255, 255, 255, 0.45)")
+                                (e.currentTarget.style.color = "#64748b")
                               }
                             >
                               <span>🔄</span>
@@ -1282,7 +1282,7 @@ export default function AdvisorPage() {
                                 color:
                                   speakingMessageId === m.id
                                     ? "#2997ff"
-                                    : "rgba(255, 255, 255, 0.45)",
+                                    : "#64748b",
                                 fontSize: "12px",
                                 cursor: "pointer",
                                 display: "flex",
@@ -1292,16 +1292,16 @@ export default function AdvisorPage() {
                                 borderRadius: "6px",
                                 backgroundColor:
                                   speakingMessageId === m.id
-                                    ? "rgba(41, 151, 255, 0.15)"
-                                    : "rgba(255, 255, 255, 0.04)",
+                                    ? "#e8f0fe"
+                                    : "#f1f5f9",
                                 transition: "all 0.15s ease",
                               }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
                               onMouseLeave={(e) =>
                                 (e.currentTarget.style.color =
                                   speakingMessageId === m.id
                                     ? "#2997ff"
-                                    : "rgba(255, 255, 255, 0.45)")
+                                    : "#64748b")
                               }
                             >
                               <span>{speakingMessageId === m.id ? "⏹" : "🔊"}</span>
@@ -1332,7 +1332,7 @@ export default function AdvisorPage() {
                                     borderRadius: "14px",
                                     padding: "6px 12px",
                                     fontSize: "12px",
-                                    color: "rgba(255, 255, 255, 0.85)",
+                                    color: "#334155",
                                     cursor: "pointer",
                                     textAlign: "left",
                                     transition: "all 0.15s ease",
@@ -1376,7 +1376,7 @@ export default function AdvisorPage() {
             left: 0,
             right: 0,
             padding: "16px 20px 20px",
-            background: "linear-gradient(to top, rgba(13, 13, 15, 0.96) 60%, transparent)",
+            background: "linear-gradient(to top, rgba(247, 248, 250, 0.98) 60%, transparent)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1387,16 +1387,16 @@ export default function AdvisorPage() {
             style={{
               width: "100%",
               maxWidth: "780px",
-              backgroundColor: "rgba(26, 26, 32, 0.82)",
+              backgroundColor: "#ffffff",
               backdropFilter: "blur(28px)",
               WebkitBackdropFilter: "blur(28px)",
-              border: "1px solid rgba(255, 255, 255, 0.14)",
+              border: "1px solid #dbe2ea",
               borderRadius: "26px",
               padding: "8px 12px 8px 16px",
               display: "flex",
               alignItems: "flex-end",
               gap: "10px",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)",
+              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.10)",
               transition: "border-color 0.2s ease, box-shadow 0.2s ease",
             }}
           >
@@ -1407,7 +1407,7 @@ export default function AdvisorPage() {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgba(255, 255, 255, 0.45)",
+                color: "#64748b",
                 fontSize: "16px",
                 cursor: "pointer",
                 padding: "8px 4px",
@@ -1439,7 +1439,7 @@ export default function AdvisorPage() {
                 background: "transparent",
                 border: "none",
                 outline: "none",
-                color: "#ffffff",
+                color: "#1f2933",
                 fontSize: "15px",
                 lineHeight: 1.45,
                 maxHeight: "180px",
@@ -1492,7 +1492,7 @@ export default function AdvisorPage() {
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: inputQuery.trim() ? "pointer" : "default",
-                  color: "#ffffff",
+                  color: "#1f2933",
                   fontSize: "16px",
                   fontWeight: 700,
                   transition: "all 0.15s ease",
@@ -1508,7 +1508,7 @@ export default function AdvisorPage() {
           <div
             style={{
               fontSize: "11px",
-              color: "rgba(255, 255, 255, 0.35)",
+              color: "#64748b",
               marginTop: "8px",
               textAlign: "center",
             }}

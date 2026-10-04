@@ -20,14 +20,35 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
+function splitSpeech(text: string): string[] {
+  const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+  const chunks: string[] = [];
+  let current = "";
+  for (const sentence of sentences) {
+    const next = `${current} ${sentence}`.trim();
+    if (next.length > 700 && current) {
+      chunks.push(current);
+      current = sentence.trim();
+    } else {
+      current = next;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
 export function useElevenLabsVoice(): UseElevenLabsVoiceReturn {
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
+  const requestControllerRef = useRef<AbortController | null>(null);
+  const activeMessageIdRef = useRef<string | null>(null);
 
   const stop = useCallback(() => {
+    requestControllerRef.current?.abort();
+    requestControllerRef.current = null;
     audioRef.current?.pause();
     audioRef.current = null;
     if (objectUrlRef.current) {
@@ -36,53 +57,60 @@ export function useElevenLabsVoice(): UseElevenLabsVoiceReturn {
     }
     setIsLoading(false);
     setSpeakingMessageId(null);
+    activeMessageIdRef.current = null;
   }, []);
 
   const speak = useCallback(async (messageId: string, text: string) => {
-    if (speakingMessageId === messageId) {
+    if (activeMessageIdRef.current === messageId) {
       stop();
       return;
     }
 
     stop();
-    const cleanText = stripMarkdown(text);
-    if (!cleanText) return;
+    const chunks = splitSpeech(stripMarkdown(text));
+    if (!chunks.length) return;
 
     setError(null);
     setIsLoading(true);
+    activeMessageIdRef.current = messageId;
+    const requestController = new AbortController();
+    requestControllerRef.current = requestController;
 
     try {
-      const response = await fetch("/api/voice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: cleanText }),
-        signal: AbortSignal.timeout(30000),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error || `Voice request failed (${response.status})`);
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      objectUrlRef.current = url;
-      const audio = new Audio(url);
-      audioRef.current = audio;
-      audio.onended = stop;
-      audio.onerror = () => {
-        setError("Voice playback failed. Check the ElevenLabs configuration.");
-        stop();
-      };
       setIsLoading(false);
       setSpeakingMessageId(messageId);
-      await audio.play();
+      for (const chunk of chunks) {
+        if (requestController.signal.aborted) return;
+        const response = await fetch("/api/voice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: chunk }),
+          signal: requestController.signal,
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          throw new Error(body?.error || `Voice request failed (${response.status})`);
+        }
+        const url = URL.createObjectURL(await response.blob());
+        objectUrlRef.current = url;
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        await new Promise<void>((resolve, reject) => {
+          audio.onended = () => resolve();
+          audio.onerror = () => reject(new Error("Voice playback failed."));
+          void audio.play().catch(reject);
+        });
+        URL.revokeObjectURL(url);
+        objectUrlRef.current = null;
+      }
+      stop();
     } catch (caught) {
+      if (requestController.signal.aborted) return;
       stop();
       setError(caught instanceof Error ? caught.message : "Voice playback failed.");
       throw caught;
     }
-  }, [speakingMessageId, stop]);
+  }, [stop]);
 
   useEffect(() => stop, [stop]);
 

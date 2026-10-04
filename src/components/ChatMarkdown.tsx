@@ -8,32 +8,25 @@ interface ChatMarkdownProps {
 }
 
 export default function ChatMarkdown({ content, isStreaming }: ChatMarkdownProps) {
+  const cleanContent = content.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").replace(/[ \t]{2,}/g, " ").trim();
   // If content is empty and streaming, show cursor
-  if (!content && isStreaming) {
+  if (!cleanContent && isStreaming) {
     return (
-      <span
-        style={{
-          display: "inline-block",
-          width: "8px",
-          height: "16px",
-          backgroundColor: "#2997ff",
-          marginLeft: "2px",
-          animation: "troposPulse 1s ease-in-out infinite",
-          verticalAlign: "middle",
-        }}
-      />
+      <span className="advisor-typing-indicator" aria-label="Generating response">
+        <i /><i /><i />
+      </span>
     );
   }
 
   // Parse blocks: code blocks, tables, headings, blockquotes, lists, paragraphs
-  const blocks = parseMarkdownBlocks(content);
+  const blocks = parseMarkdownBlocks(cleanContent);
 
   return (
     <div
       style={{
         lineHeight: 1.68,
         fontSize: "15px",
-        color: "rgba(255, 255, 255, 0.92)",
+        color: "#2b2f36",
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', sans-serif",
       }}
@@ -62,7 +55,7 @@ export default function ChatMarkdown({ content, isStreaming }: ChatMarkdownProps
                   borderLeft: "3px solid #2997ff",
                   backgroundColor: "rgba(41, 151, 255, 0.06)",
                   borderRadius: "0 10px 10px 0",
-                  color: "rgba(255, 255, 255, 0.8)",
+                  color: "#5d6570",
                   fontSize: "14px",
                 }}
               >
@@ -82,7 +75,7 @@ export default function ChatMarkdown({ content, isStreaming }: ChatMarkdownProps
                 }}
               >
                 {block.items.map((item, i) => (
-                  <li key={i} style={{ color: "rgba(255, 255, 255, 0.88)" }}>
+                  <li key={i} style={{ color: "#343a40" }}>
                     <InlineMarkdown text={item} />
                   </li>
                 ))}
@@ -101,7 +94,7 @@ export default function ChatMarkdown({ content, isStreaming }: ChatMarkdownProps
                 }}
               >
                 {block.items.map((item, i) => (
-                  <li key={i} style={{ color: "rgba(255, 255, 255, 0.88)" }}>
+                  <li key={i} style={{ color: "#343a40" }}>
                     <InlineMarkdown text={item} />
                   </li>
                 ))}
@@ -113,7 +106,7 @@ export default function ChatMarkdown({ content, isStreaming }: ChatMarkdownProps
                 key={idx}
                 style={{
                   border: "none",
-                  borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderTop: "1px solid #e2e8f0",
                   margin: "20px 0",
                 }}
               />
@@ -194,7 +187,7 @@ function FormattedText({ text }: { text: string }) {
       {boldParts.map((part, idx) => {
         if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
           return (
-            <strong key={idx} style={{ color: "#ffffff", fontWeight: 650 }}>
+            <strong key={idx} style={{ color: "#1f2937", fontWeight: 650 }}>
               {part.slice(2, -2)}
             </strong>
           );
@@ -219,10 +212,10 @@ function FormattedText({ text }: { text: string }) {
 // ─── Heading Block ────────────────────────────────────────────────────────────
 function HeadingBlock({ level, text }: { level: number; text: string }) {
   const styles: Record<number, React.CSSProperties> = {
-    1: { fontSize: "22px", fontWeight: 700, margin: "24px 0 12px", color: "#ffffff", letterSpacing: "-0.4px" },
-    2: { fontSize: "19px", fontWeight: 700, margin: "20px 0 10px", color: "#ffffff", letterSpacing: "-0.3px" },
+    1: { fontSize: "22px", fontWeight: 700, margin: "24px 0 12px", color: "#172033", letterSpacing: "-0.4px" },
+    2: { fontSize: "19px", fontWeight: 700, margin: "20px 0 10px", color: "#172033", letterSpacing: "-0.3px" },
     3: { fontSize: "16px", fontWeight: 650, margin: "16px 0 8px", color: "#2997ff", letterSpacing: "-0.2px" },
-    4: { fontSize: "14px", fontWeight: 650, margin: "14px 0 6px", color: "rgba(255, 255, 255, 0.9)" },
+    4: { fontSize: "14px", fontWeight: 650, margin: "14px 0 6px", color: "#334155" },
   };
 
   const currentStyle = styles[level] || styles[3];
@@ -264,7 +257,7 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
           backgroundColor: "rgba(255, 255, 255, 0.03)",
           borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
           fontSize: "11px",
-          color: "rgba(255, 255, 255, 0.45)",
+          color: "#64748b",
           textTransform: "uppercase",
           letterSpacing: "0.5px",
         }}
@@ -337,7 +330,7 @@ function TableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) 
                 style={{
                   padding: "10px 14px",
                   fontWeight: 650,
-                  color: "#ffffff",
+                  color: "#1f2937",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -360,7 +353,7 @@ function TableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) 
                   key={cIdx}
                   style={{
                     padding: "9px 14px",
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: "#475569",
                   }}
                 >
                   <InlineMarkdown text={cell.trim()} />
