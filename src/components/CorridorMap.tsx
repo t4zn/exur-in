@@ -167,9 +167,6 @@ export default function CorridorMap({
       const color = statusColor(station.status);
       const isSevere = station.aqi > 200;
 
-      // debug: log station being rendered
-      try { console.log('[CorridorMap] addMarker', station.id, station.name, station.lat, station.lng, 'AQI', station.aqi); } catch(e){}
-
       const customHtml = `
         <div class="tropos-station-marker dark-mode ${isSelected ? "selected" : ""}" id="marker-${station.id}">
           <div class="tropos-marker-badge">
@@ -198,7 +195,6 @@ export default function CorridorMap({
 
       marker.on("click", (e) => {
         leaflet.DomEvent.stopPropagation(e);
-        try { console.log('[CorridorMap] marker.click', station.id, station.name); } catch(e){}
         // toggle selection
         if (selectedStation?.id === station.id) onSelectStation(null);
         else onSelectStation(station);

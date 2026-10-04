@@ -138,33 +138,37 @@ src/
 └── types/                       Shared TypeScript types
 ```
 
+The example file contains variable names and safe defaults only. Keep actual
+credentials in the deployment platform or in the ignored `.env.local` file.
+
 ## Requirements
 
 - Node.js 20 or newer
 - npm, pnpm, or another compatible package manager
 - API keys only for features that require external services
 
-The repository declares `pnpm@10.17.0` as its package manager, but the existing
-scripts also work with npm.
+The repository declares `pnpm@10.17.0` as its package manager. npm can also run
+the scripts when pnpm is not available.
 
 ## Installation
 
 ```bash
 git clone <repository-url>
 cd exur-in
-npm install
+pnpm install
 ```
 
-Or with pnpm:
+Or with npm:
 
 ```bash
-pnpm install
+npm install
 ```
 
 ## Environment configuration
 
-Create a local `.env.local` file in the repository root. Never commit this
-file or expose server-side credentials in `NEXT_PUBLIC_*` variables.
+Copy [`.env.example`](.env.example) to `.env.local` and add credentials in the
+repository root. Never commit `.env.local` or expose server-side credentials in
+`NEXT_PUBLIC_*` variables.
 
 ```env
 # AI advisor
@@ -214,10 +218,11 @@ browser's built-in speech synthesis where supported.
 
 ## Running locally
 
-Start the development server:
+Install dependencies and start the development server:
 
 ```bash
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -225,11 +230,13 @@ Open [http://localhost:3000](http://localhost:3000).
 Available scripts:
 
 ```bash
-npm run dev       # Start Next.js development server
-npm run build     # Create a production build
-npm run start     # Start the production server
-npm run lint      # Run ESLint
+pnpm dev          # Start Next.js development server
+pnpm build        # Create a production build
+pnpm start        # Start the production server
+pnpm lint         # Run ESLint
 ```
+
+The equivalent `npm run <script>` commands are supported.
 
 ## Chat memory and privacy
 
@@ -264,8 +271,8 @@ Always verify operational decisions against current official sources.
 
 ## Design system
 
-The interface follows an Apple-inspired visual system documented in
-[`DESIGN.md`](DESIGN.md):
+The interface follows an Apple-inspired visual system implemented in
+[`src/app/globals.css`](src/app/globals.css) and shared components:
 
 - White, parchment, and near-black canvas modes
 - Action Blue as the primary interactive color
@@ -274,7 +281,7 @@ The interface follows an Apple-inspired visual system documented in
 - Responsive layouts for desktop and mobile
 
 The product and feature specification is documented in
-[`VAYU_SPEC.md`](VAYU_SPEC.md).
+the source structure and the technical notes in [`docs/`](docs/).
 
 ## Deployment
 
@@ -287,7 +294,7 @@ npm run build
 Start the production server:
 
 ```bash
-npm run start
+pnpm start
 ```
 
 For Vercel or another hosting provider:
@@ -303,8 +310,7 @@ For Vercel or another hosting provider:
 ### Advisor returns local fallback responses
 
 Check that `GEMINI_API_KEY` or `GEMMA_API_KEY` is present, valid, and loaded by
-the current server process. Restart the development server after changing
-`.env.local`.
+the current server process. Restart the server after changing `.env.local`.
 
 ### Advisor stream does not update
 

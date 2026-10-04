@@ -156,7 +156,6 @@ export default function FloatingAdvisor() {
       }
     } catch (err: any) {
       if (err.name === "AbortError") {
-        console.log("Floating stream aborted.");
       } else {
         console.error(err);
         setMessages((prev) =>

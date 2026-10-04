@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Apple Design System — DESIGN.md Specification
+   Exur visual system
    Photography-first, minimal, rich-spacing design architecture
    ========================================================================== */
 
@@ -113,7 +113,7 @@ textarea {
 }
 
 /* ==========================================================================
-   Typography Hierarchy (SF Pro Tokens from DESIGN.md — Full Scale for PC)
+   Typography hierarchy
    ========================================================================== */
 
 .hero-display {
@@ -319,7 +319,7 @@ textarea {
 }
 
 /* ==========================================================================
-   Apple Components (from DESIGN.md)
+   Shared interface components
    ========================================================================== */
 
 /* Global Nav (Ultra-thin 44px Black Nav) */

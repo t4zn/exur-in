@@ -332,7 +332,6 @@ export default function AdvisorPage() {
       }
     } catch (err: any) {
       if (err.name === "AbortError") {
-        console.log("Stream generation stopped by user.");
       } else {
         console.error("Chat error:", err);
         setSessions((prev) =>
