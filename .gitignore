@@ -15,8 +15,15 @@
 
 # next.js
 /.next/
-/out/
+# /out/ is tracked for Render Python web service deployment without Node
 
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
 # production
 /build
 
