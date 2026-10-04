@@ -145,8 +145,17 @@ export default function CorridorMap({
 
     return () => {
       isCancelled = true;
+      markersRef.current.forEach((m) => {
+        try {
+          m.closeTooltip();
+          m.remove();
+        } catch (_) {}
+      });
+      markersRef.current = [];
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch (_) {}
         mapInstanceRef.current = null;
         setMapReady(false);
       }
@@ -215,7 +224,14 @@ export default function CorridorMap({
     map.on("click", onMapClick);
 
     return () => {
-      map.off("click", onMapClick);
+      try { map.off("click", onMapClick); } catch (_) {}
+      markersRef.current.forEach((m) => {
+        try {
+          m.closeTooltip();
+          m.remove();
+        } catch (_) {}
+      });
+      markersRef.current = [];
     };
   }, [stations, selectedStation, mapReady, onSelectStation]);
 

@@ -13,7 +13,9 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const lat = searchParams.get("lat");
   const lon = searchParams.get("lon") || searchParams.get("lng");
-  const radius = searchParams.get("radius") || "50000";
+  const rawRadius = searchParams.get("radius") || "25000";
+  // OpenAQ v3 restricts radius to a maximum of 25,000 meters (25 km)
+  const radius = String(Math.min(25000, Math.max(100, parseInt(rawRadius, 10) || 25000)));
 
   if (!lat || !lon || !Number.isFinite(parseFloat(lat)) || !Number.isFinite(parseFloat(lon))) {
     return NextResponse.json({ error: "Invalid coordinates provided" }, { status: 400 });
