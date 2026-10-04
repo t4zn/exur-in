@@ -4,15 +4,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import ChatMarkdown from "@/components/ChatMarkdown";
+import { useElevenLabsVoice } from "@/hooks/useElevenLabsVoice";
+import type { ChatMessage } from "@/types/advisor";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  provider?: string;
-  suggestedFollowUps?: string[];
-  timestamp: string;
-}
+type Message = ChatMessage;
+
+const FLOATING_CHAT_STORAGE_KEY = "exur_floating_advisor_messages_v1";
 
 export default function FloatingAdvisor() {
   const pathname = usePathname();
@@ -24,10 +21,33 @@ export default function FloatingAdvisor() {
   const [inputQuery, setInputQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const { speakingMessageId, speak, error: voiceError } = useElevenLabsVoice();
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(FLOATING_CHAT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed)) setMessages(parsed);
+      }
+    } catch (error) {
+      console.warn("Failed to restore floating advisor history", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        window.localStorage.setItem(FLOATING_CHAT_STORAGE_KEY, JSON.stringify(messages.slice(-80)));
+      } catch (error) {
+        console.warn("Failed to save floating advisor history", error);
+      }
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (isOpen) {
@@ -164,6 +184,20 @@ export default function FloatingAdvisor() {
     }
     setIsLoading(false);
     setStreamingMessageId(null);
+  };
+
+  const handleSpeak = async (id: string, text: string) => {
+    try {
+      await speak(id, text);
+    } catch {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(
+        text.replace(/[#>*_`~]/g, "").replace(/\|/g, " ").replace(/\s+/g, " ").trim()
+      );
+      utterance.rate = 1.05;
+      window.speechSynthesis.speak(utterance);
+    }
   };
 
   const samplePrompt =
@@ -438,6 +472,26 @@ export default function FloatingAdvisor() {
                       </div>
 
                       <ChatMarkdown content={m.content} isStreaming={isStreamingThis} />
+                      {!isStreamingThis && m.content && (
+                        <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
+                          <button
+                            type="button"
+                            onClick={() => handleSpeak(m.id, m.content)}
+                            aria-label={speakingMessageId === m.id ? "Stop voice" : "Read response aloud"}
+                            style={{
+                              border: "1px solid rgba(255,255,255,0.12)",
+                              borderRadius: "8px",
+                              padding: "4px 8px",
+                              color: speakingMessageId === m.id ? "#2997ff" : "rgba(255,255,255,0.55)",
+                              background: "rgba(255,255,255,0.04)",
+                              cursor: "pointer",
+                              fontSize: "11px",
+                            }}
+                          >
+                            {speakingMessageId === m.id ? "Stop voice" : "Read aloud"}
+                          </button>
+                        </div>
+                      )}
 
                       {/* Follow-up chips */}
                       {!isStreamingThis &&
@@ -451,6 +505,11 @@ export default function FloatingAdvisor() {
                               marginTop: "10px",
                             }}
                           >
+                            {voiceError && (
+                              <div role="status" style={{ color: "rgba(255,190,190,0.9)", fontSize: "11px", marginBottom: "8px" }}>
+                                ElevenLabs unavailable; browser voice fallback is available.
+                              </div>
+                            )}
                             {m.suggestedFollowUps.slice(0, 2).map((fu, fIdx) => (
                               <button
                                 key={fIdx}

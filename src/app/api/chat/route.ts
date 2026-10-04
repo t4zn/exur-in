@@ -109,21 +109,28 @@ export async function POST(req: NextRequest) {
             parts: [{ text: m.content }],
           }));
 
-          const gemmaRes = await fetch(gemmaUrl, {
-            method: "POST",
-            headers: authHeaders,
-            body: JSON.stringify({
-              contents: [
-                { role: "user", parts: [{ text: `System Context: ${SYSTEM_PROMPT}` }] },
-                ...gemmaContents,
-              ],
-              generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 2048,
-              },
-            }),
-            signal: AbortSignal.timeout(18000),
-          });
+          const gemmaController = new AbortController();
+          const gemmaTimeout = setTimeout(() => gemmaController.abort(), 18000);
+          let gemmaRes: Response;
+          try {
+            gemmaRes = await fetch(gemmaUrl, {
+              method: "POST",
+              headers: authHeaders,
+              body: JSON.stringify({
+                contents: [
+                  { role: "user", parts: [{ text: `System Context: ${SYSTEM_PROMPT}` }] },
+                  ...gemmaContents,
+                ],
+                generationConfig: {
+                  temperature: 0.3,
+                  maxOutputTokens: 2048,
+                },
+              }),
+              signal: gemmaController.signal,
+            });
+          } finally {
+            clearTimeout(gemmaTimeout);
+          }
 
           if (gemmaRes.ok && gemmaRes.body) {
             const reader = gemmaRes.body.getReader();
@@ -175,7 +182,17 @@ export async function POST(req: NextRequest) {
                   );
                   controller.close();
                 } catch (err) {
-                  controller.error(err);
+                  console.warn("[Stream API] Gemma stream ended unexpectedly:", err);
+                  controller.enqueue(
+                    encoder.encode(
+                      `data: ${JSON.stringify({
+                        done: true,
+                        provider: "Exur fallback after Gemma stream interruption",
+                        suggestedFollowUps: followUps,
+                      })}\n\n`
+                    )
+                  );
+                  controller.close();
                 }
               },
             });
@@ -213,7 +230,6 @@ export async function POST(req: NextRequest) {
               max_tokens: 1600,
               stream: true,
             }),
-            signal: AbortSignal.timeout(10000),
           });
 
           if (groqRes.ok && groqRes.body) {
@@ -263,7 +279,17 @@ export async function POST(req: NextRequest) {
                   );
                   controller.close();
                 } catch (err) {
-                  controller.error(err);
+                  console.warn("[Stream API] Groq stream ended unexpectedly:", err);
+                  controller.enqueue(
+                    encoder.encode(
+                      `data: ${JSON.stringify({
+                        done: true,
+                        provider: "Exur fallback after LPU stream interruption",
+                        suggestedFollowUps: followUps,
+                      })}\n\n`
+                    )
+                  );
+                  controller.close();
                 }
               },
             });

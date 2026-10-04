@@ -14,6 +14,21 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Advisor voice configuration
+
+The advisor can read responses aloud with ElevenLabs. Add these values to a
+local `.env.local` file; never expose the API key in client-side code:
+
+```env
+ELEVENLABS_API_KEY=your_api_key
+ELEVENLABS_VOICE_ID=your_voice_id
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2
+```
+
+If ElevenLabs is not configured or temporarily unavailable, the advisor falls
+back to the browser's built-in speech synthesis. Chat sessions are stored
+locally in the browser and migrated from older Exur advisor storage versions.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

@@ -1,24 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import ChatMarkdown from "@/components/ChatMarkdown";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  provider?: string;
-  suggestedFollowUps?: string[];
-  timestamp: string;
-}
-
-interface ChatSession {
-  id: string;
-  title: string;
-  createdAt: number;
-  messages: Message[];
-}
+import type { ChatMessage as Message, ChatSession } from "@/types/advisor";
+import { loadAdvisorSessions, saveAdvisorSessions } from "@/lib/advisorStorage";
+import { useElevenLabsVoice } from "@/hooks/useElevenLabsVoice";
 
 const PRESET_TILES = [
   {
@@ -51,12 +38,11 @@ const PRESET_TILES = [
   },
 ];
 
-const LOCAL_STORAGE_KEY = "exur_advisor_sessions_v2";
-
 const DEFAULT_SESSION: ChatSession = {
   id: "session-init",
   title: "New Conversation",
   createdAt: 0,
+  lastActivityAt: 0,
   messages: [],
 };
 
@@ -74,8 +60,7 @@ export default function AdvisorPage() {
   const [selectedModel, setSelectedModel] = useState<"auto" | "gemma" | "groq">("gemma");
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
 
-  // Audio / Speech Synthesis state
-  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const { speakingMessageId, speak, error: voiceError } = useElevenLabsVoice();
 
   // Copy feedback state
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -90,16 +75,11 @@ export default function AdvisorPage() {
   // ─── Initialize Sessions from LocalStorage ──────────────────────────────────
   useEffect(() => {
     try {
-      const stored =
-        localStorage.getItem(LOCAL_STORAGE_KEY) ||
-        localStorage.getItem("tropos_advisor_sessions_v2");
-      if (stored) {
-        const parsed: ChatSession[] = JSON.parse(stored);
-        if (parsed.length > 0) {
-          setSessions(parsed);
-          setCurrentSessionId(parsed[0].id);
-          return;
-        }
+      const parsed = loadAdvisorSessions();
+      if (parsed.length > 0) {
+        setSessions(parsed);
+        setCurrentSessionId(parsed[0].id);
+        return;
       }
     } catch (e) {
       console.warn("Failed to load past sessions", e);
@@ -110,6 +90,7 @@ export default function AdvisorPage() {
       id: "session-" + Date.now(),
       title: "New Conversation",
       createdAt: Date.now(),
+      lastActivityAt: Date.now(),
       messages: [],
     };
     setSessions([initialSession]);
@@ -120,7 +101,7 @@ export default function AdvisorPage() {
   useEffect(() => {
     if (sessions.length > 0) {
       try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sessions));
+        saveAdvisorSessions(sessions);
       } catch (e) {
         console.warn("Failed to save sessions to localStorage", e);
       }
@@ -173,6 +154,7 @@ export default function AdvisorPage() {
       id: "session-" + Date.now(),
       title: "New Conversation",
       createdAt: Date.now(),
+      lastActivityAt: Date.now(),
       messages: [],
     };
     setSessions((prev) => [newSession, ...prev]);
@@ -192,6 +174,7 @@ export default function AdvisorPage() {
         id: "session-" + Date.now(),
         title: "New Conversation",
         createdAt: Date.now(),
+        lastActivityAt: Date.now(),
         messages: [],
       };
       setSessions([fresh]);
@@ -247,6 +230,7 @@ export default function AdvisorPage() {
           ? {
               ...s,
               title: updatedTitle,
+              lastActivityAt: Date.now(),
               messages: [...updatedMessages, initialAssistantMessage],
             }
           : s
@@ -407,38 +391,30 @@ export default function AdvisorPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Text to Speech
-  const handleSpeak = (id: string, text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-
-    if (speakingMessageId === id) {
+  const handleSpeak = async (id: string, text: string) => {
+    try {
+      await speak(id, text);
+    } catch {
+      if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+      const cleanText = text.replace(/[#>*_`~]/g, "").replace(/\|/g, " ").replace(/\s+/g, " ").trim();
       window.speechSynthesis.cancel();
-      setSpeakingMessageId(null);
-      return;
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 1.05;
+      window.speechSynthesis.speak(utterance);
     }
-
-    window.speechSynthesis.cancel();
-    // Clean markdown before speaking
-    const cleanText = text
-      .replace(/#+\s+/g, "")
-      .replace(/\*\*/g, "")
-      .replace(/`+/g, "")
-      .replace(/\|/g, " ");
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = 1.05;
-    utterance.pitch = 1.0;
-    utterance.onend = () => setSpeakingMessageId(null);
-    utterance.onerror = () => setSpeakingMessageId(null);
-
-    setSpeakingMessageId(id);
-    window.speechSynthesis.speak(utterance);
   };
 
   // Filtered session list
-  const filteredSessions = sessions.filter((s) =>
-    s.title.toLowerCase().includes(searchHistoryQuery.toLowerCase())
-  );
+  const filteredSessions = sessions
+    .filter((s) => !s.archived)
+    .filter((s) => {
+      const query = searchHistoryQuery.toLowerCase();
+      return (
+        s.title.toLowerCase().includes(query) ||
+        s.messages.some((message) => message.content.toLowerCase().includes(query))
+      );
+    })
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.lastActivityAt - a.lastActivityAt);
 
   return (
     <div
@@ -907,6 +883,24 @@ export default function AdvisorPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span
+              title={voiceError || "Voice playback uses ElevenLabs when configured, with browser fallback"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "5px 9px",
+                borderRadius: "999px",
+                border: `1px solid ${voiceError ? "rgba(255,149,0,0.35)" : "rgba(48,209,88,0.25)"}`,
+                background: voiceError ? "rgba(255,149,0,0.1)" : "rgba(48,209,88,0.08)",
+                color: voiceError ? "#ffb340" : "#7ee2a0",
+                fontSize: "11px",
+                fontWeight: 600,
+              }}
+            >
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }} />
+              {voiceError ? "Browser voice fallback" : "Voice ready"}
+            </span>
             <button
               onClick={handleCreateNewChat}
               style={{
