@@ -285,6 +285,8 @@ the source structure and the technical notes in [`docs/`](docs/).
 
 ## Deployment
 
+The platform is deployed at [exur.in](https://exur.in).
+
 Build the application:
 
 ```bash
